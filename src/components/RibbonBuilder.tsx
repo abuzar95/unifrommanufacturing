@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { CustomRibbonOrder, StripeConfig } from '../types';
-import { apiSubmitCustomOrder } from '../lib/supabaseClient';
+import { apiSubmitCustomOrder } from '../lib/api';
 import { Sparkles, Save, ShieldAlert, BookOpen, Send, Plus, Trash2, Globe, CheckCircle } from 'lucide-react';
 
 interface RibbonBuilderProps {
@@ -143,9 +143,9 @@ export default function RibbonBuilder({ onInquirySubmitted }: RibbonBuilderProps
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-8 text-center md:text-left">
-        <h2 className="font-sans text-3xl font-extrabold tracking-tight text-slate-900">
+    <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="mb-6 sm:mb-8 text-center md:text-left">
+        <h2 className="font-sans text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
           Bespoke Ribbon Customization Studio
         </h2>
         <p className="mt-2 font-sans text-sm text-gray-500 max-w-2xl">
@@ -171,7 +171,7 @@ export default function RibbonBuilder({ onInquirySubmitted }: RibbonBuilderProps
                 borderWidth: '3.5px',
                 borderStyle: 'solid'
               }}
-              className="relative w-64 h-18 rounded-lg shadow-xl overflow-hidden flex items-center justify-center"
+              className="relative w-full max-w-xs sm:w-64 h-16 sm:h-18 rounded-lg shadow-xl overflow-hidden flex items-center justify-center"
             >
               {/* Stripes Overlay loop */}
               <div className="absolute inset-0 flex justify-evenly pointer-events-none">

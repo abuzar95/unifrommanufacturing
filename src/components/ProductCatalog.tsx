@@ -89,10 +89,9 @@ export default function ProductCatalog({ products, currency, onAddToCart }: Prod
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-      {/* Search and Category Header Controls */}
-      <div className="mb-10 text-center sm:text-left">
-        <h2 className="font-sans text-3xl font-extrabold tracking-tight text-slate-900">
+    <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="mb-8 sm:mb-10 text-center sm:text-left">
+        <h2 className="font-sans text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
           World-Class Standards Catalog
         </h2>
         <p className="mt-2 font-sans text-sm text-gray-500 max-w-xl">
@@ -109,13 +108,13 @@ export default function ProductCatalog({ products, currency, onAddToCart }: Prod
               <span>Award Categories</span>
             </h3>
 
-            <div className="flex flex-wrap lg:grid gap-1">
+            <div className="flex gap-2 overflow-x-auto pb-2 lg:grid lg:grid-cols-1 lg:gap-1 lg:overflow-visible lg:pb-0 -mx-1 px-1">
               {categoriesList.map((cat) => (
                 <button
                   key={cat.id}
                   id={`cat-filter-${cat.id}`}
                   onClick={() => setSelectedCategory(cat.id as any)}
-                  className={`flex w-full items-center justify-between px-3 py-2.5 text-xs rounded-lg font-medium transition-all ${
+                  className={`flex shrink-0 lg:w-full items-center justify-between px-3 py-2.5 text-xs rounded-lg font-medium transition-all whitespace-nowrap ${
                     selectedCategory === cat.id
                       ? 'bg-slate-900 text-white font-semibold'
                       : 'text-gray-600 hover:bg-slate-50 hover:text-slate-950'

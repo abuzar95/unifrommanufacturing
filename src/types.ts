@@ -62,9 +62,3 @@ export interface StandardOrder {
   status: 'pending_invoice' | 'payment_confirmed' | 'manufactured' | 'dispatched';
   created_at: string;
 }
-
-export interface SupabaseConfigState {
-  supabase_url: string;
-  supabase_anon_key: string;
-  is_connected: boolean;
-}

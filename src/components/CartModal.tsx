@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { Product, StandardOrder } from '../types';
-import { apiSubmitStandardOrder } from '../lib/supabaseClient';
+import { apiSubmitStandardOrder } from '../lib/api';
 import { ShoppingBag, Trash2, ShieldCheck, Mail, Send, CheckCircle2, Globe, AlertCircle } from 'lucide-react';
 
 interface CartItem {
@@ -131,17 +131,16 @@ export default function CartModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/75 backdrop-blur-xs">
       <div 
         id="cart-modal-container"
-        className="relative w-full max-w-4xl rounded-2xl bg-white shadow-2xl overflow-hidden border border-gray-150 flex flex-col max-h-[92vh]"
+        className="relative w-full sm:max-w-4xl rounded-t-2xl sm:rounded-2xl bg-white shadow-2xl overflow-hidden border border-gray-150 flex flex-col max-h-[95vh] sm:max-h-[92vh]"
       >
-        {/* Header bar */}
-        <div className="bg-slate-900 px-6 py-5 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <ShoppingBag className="h-5.5 w-5.5 text-amber-500" />
-            <h3 className="font-sans text-base font-bold text-white uppercase tracking-wider">
-              Wholesale Cart Quote Proposal ({cartItems.length} styles)
+        <div className="bg-slate-900 px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-800 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <ShoppingBag className="h-5 w-5 text-amber-500 shrink-0" />
+            <h3 className="font-sans text-sm sm:text-base font-bold text-white uppercase tracking-wider truncate">
+              Wholesale Quote ({cartItems.length})
             </h3>
           </div>
           <button
@@ -165,9 +164,8 @@ export default function CartModal({
             </p>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto grid md:grid-cols-12">
-            {/* Left Column: Cart items and calculator summary */}
-            <div className="md:col-span-7 p-6 border-r border-gray-100 flex flex-col justify-between max-h-[60vh] overflow-y-auto">
+          <div className="flex-1 overflow-y-auto flex flex-col md:grid md:grid-cols-12">
+            <div className="md:col-span-7 p-4 sm:p-6 border-b md:border-b-0 md:border-r border-gray-100 flex flex-col justify-between md:max-h-none overflow-y-auto">
               {computedItems.length === 0 ? (
                 <div className="text-center py-16 space-y-2">
                   <ShoppingBag className="h-10 w-10 text-gray-300 mx-auto" />
@@ -274,8 +272,7 @@ export default function CartModal({
 
             </div>
 
-            {/* Right Column: Contact Detail Invoice generator Form */}
-            <div className="md:col-span-5 p-6 bg-slate-50 overflow-y-auto max-h-[60vh] md:max-h-full">
+            <div className="md:col-span-5 p-4 sm:p-6 bg-slate-50 overflow-y-auto">
               <form onSubmit={handleSubmitOrder} className="space-y-4">
                 <div className="space-y-1">
                   <h4 className="font-sans text-xs font-bold text-slate-800 uppercase tracking-wider">

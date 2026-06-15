@@ -6,14 +6,13 @@
 import React, { useState, useEffect } from 'react';
 import { Product, CustomRibbonOrder, StandardOrder, ProductCategory } from '../types';
 import { 
-  apiGetProducts, apiSaveProduct, apiDeleteProduct, 
+  apiSaveProduct, apiDeleteProduct, 
   apiGetCustomOrders, apiUpdateCustomOrderStatus,
   apiGetStandardOrders, apiUpdateStandardOrderStatus,
-  isSupabaseConfigured, SUPABASE_SQL_SCHEMA 
-} from '../lib/supabaseClient';
+} from '../lib/api';
 import { 
-  Database, Plus, Trash2, FileJson, Check, ClipboardCopy, 
-  CheckCircle, Globe, ShoppingBag, ShieldAlert, BadgeInfo, Eye 
+  Plus, Trash2, 
+  Globe
 } from 'lucide-react';
 
 interface AdminPanelProps {
@@ -23,16 +22,14 @@ interface AdminPanelProps {
 }
 
 export default function AdminPanel({ products, refreshProducts, currency }: AdminPanelProps) {
-  const [activeSubTab, setActiveSubTab] = useState<'products' | 'custom_orders' | 'std_orders' | 'supabase'>('custom_orders');
+  const [activeSubTab, setActiveSubTab] = useState<'products' | 'custom_orders' | 'std_orders'>('custom_orders');
   
   // Storage states for inquiries
   const [customOrders, setCustomOrders] = useState<CustomRibbonOrder[]>([]);
   const [standardOrders, setStandardOrders] = useState<StandardOrder[]>([]);
   
-  // Clipboard copied indicator
-  const [copiedSql, setCopiedSql] = useState(false);
-
-  // New product inputs form
+  const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [newProdName, setNewProdName] = useState('');
   const [newProdCategory, setNewProdCategory] = useState<ProductCategory>('ribbon');
   const [newProdSKU, setNewProdSKU] = useState('');
@@ -42,8 +39,6 @@ export default function AdminPanel({ products, refreshProducts, currency }: Admi
   const [newProdDesc, setNewProdDesc] = useState('');
   const [newProdMOQ, setNewProdMOQ] = useState(50);
   const [newProdLeadTime, setNewProdLeadTime] = useState(10);
-  const [isAddingProduct, setIsAddingProduct] = useState(false);
-  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     loadOrdersAndInquiries();
@@ -110,15 +105,6 @@ export default function AdminPanel({ products, refreshProducts, currency }: Admi
     loadOrdersAndInquiries();
   };
 
-  const handleCopySql = () => {
-    navigator.clipboard.writeText(SUPABASE_SQL_SCHEMA);
-    setCopiedSql(true);
-    setTimeout(() => setCopiedSql(false), 2000);
-  };
-
-  const isConnected = isSupabaseConfigured();
-
-  // Helper inside loop to display mini visual vector of custom stripe configurations
   const renderStripeDesignRow = (order: CustomRibbonOrder) => {
     return (
       <div 
@@ -151,32 +137,23 @@ export default function AdminPanel({ products, refreshProducts, currency }: Admi
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-8">
       
-      {/* Top Banner Control */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-gray-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100">
         <div>
-          <h2 className="font-sans text-2xl font-bold tracking-tight text-slate-900">
+          <h2 className="font-sans text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
             Staff Administrative Dashboard
           </h2>
           <p className="text-xs text-gray-500 mt-1 font-sans">
-            Manage catalog specifications, audit wholesale order proforma drafts, and review CAD ribbon weaving blueprints.
+            Manage catalog, wholesale orders, and custom ribbon blueprints.
           </p>
         </div>
 
-        {/* Database Quick Health state */}
         <div className="flex items-center gap-2">
-          {isConnected ? (
-            <div className="flex items-center gap-1.5 bg-green-50 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-lg border border-green-200">
-              <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-              <span>Supabase Direct Connect Live</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-1.5 bg-amber-50 text-amber-700 text-xs font-semibold px-3 py-1.5 rounded-lg border border-amber-200">
-              <span className="h-2 w-2 rounded-full bg-amber-500" />
-              <span>Offline Preview Mode Active</span>
-            </div>
-          )}
+          <div className="flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-lg border border-blue-200">
+            <span className="h-2 w-2 rounded-full bg-blue-500" />
+            <span>Local Storage Mode</span>
+          </div>
         </div>
       </div>
 
@@ -215,19 +192,7 @@ export default function AdminPanel({ products, refreshProducts, currency }: Admi
               : 'border-transparent text-gray-400 hover:text-gray-700'
           }`}
         >
-          Products Stock Control ({products.length})
-        </button>
-
-        <button
-          id="admin-subtab-supabase"
-          onClick={() => setActiveSubTab('supabase')}
-          className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider rounded-t-lg border-t-2 border-x transition-all select-none ${
-            activeSubTab === 'supabase'
-              ? 'border-slate-950 bg-white text-slate-950 font-black'
-              : 'border-transparent text-gray-400 hover:text-gray-700'
-          }`}
-        >
-          Database Hub Connection
+          Products Stock ({products.length})
         </button>
       </div>
 
@@ -291,7 +256,7 @@ export default function AdminPanel({ products, refreshProducts, currency }: Admi
                   </div>
 
                   {/* Render design alongside actions */}
-                  <div className="flex flex-col justify-between items-end gap-4 min-w-[150px]">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 min-w-0">
                     {renderStripeDesignRow(order)}
 
                     <div className="space-y-1.5 w-full text-right">
@@ -383,7 +348,7 @@ export default function AdminPanel({ products, refreshProducts, currency }: Admi
                   </div>
 
                   {/* Move state controller */}
-                  <div className="flex justify-end gap-1.5 pt-2 border-t border-gray-50">
+                  <div className="flex flex-col sm:flex-row sm:justify-end gap-2 pt-2 border-t border-gray-50">
                     <label className="text-[10px] font-bold uppercase text-gray-400 shrink-0 self-center">Set Order State:</label>
                     <select
                       id={`status-select-std-${order.id}`}
@@ -550,8 +515,8 @@ export default function AdminPanel({ products, refreshProducts, currency }: Admi
             </form>
           )}
 
-          {/* Table display */}
-          <div className="overflow-x-auto rounded-xl border border-gray-150 bg-white">
+          {/* Desktop table */}
+          <div className="hidden md:block overflow-x-auto rounded-xl border border-gray-150 bg-white">
             <table className="w-full border-collapse text-left text-xs text-slate-800">
               <thead>
                 <tr className="bg-slate-50 border-b border-gray-150 text-slate-400 font-bold uppercase tracking-wider font-mono">
@@ -588,76 +553,38 @@ export default function AdminPanel({ products, refreshProducts, currency }: Admi
               </tbody>
             </table>
           </div>
-        </div>
-      )}
 
-      {/* SUBTAB CONTENT 4: SUPABASE DATABASE HUB CONNECTION GUIDE */}
-      {activeSubTab === 'supabase' && (
-        <div className="gap-6 grid md:grid-cols-12">
-          
-          <div className="md:col-span-4 space-y-4">
-            <div className="bg-white border border-gray-150 rounded-xl p-5 space-y-3 shadow-xs">
-              <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase bg-blue-50 text-blue-800 border border-blue-200 py-0.5 px-2 rounded-full font-bold">
-                Integration Protocol
-              </span>
-
-              <h4 className="font-sans text-sm font-bold text-slate-900">Configure Supabase Secrets</h4>
-              <p className="text-xs text-gray-600 leading-normal">
-                To connect this premium awards store with a real Supabase PostgreSQL backend, populate the environment variables below in your workspace environment configuration panel:
-              </p>
-
-              <div className="bg-slate-50 border border-gray-200 rounded p-3 text-[11px] font-mono text-slate-700 space-y-1.5">
-                <div>
-                  <span className="text-gray-400"># URL Endpoint:</span>
-                  <p className="text-slate-800 break-all font-bold">VITE_SUPABASE_URL</p>
+          {/* Mobile card list */}
+          <div className="md:hidden grid gap-3">
+            {products.map((p) => (
+              <div key={p.id} className="bg-white border border-gray-150 rounded-xl p-4 space-y-2">
+                <div className="flex justify-between items-start gap-2">
+                  <div>
+                    <span className="font-mono text-xs font-bold text-amber-700">{p.sku}</span>
+                    <h4 className="font-semibold text-slate-900 text-sm mt-0.5">{p.name}</h4>
+                    <span className="text-[10px] text-gray-400 bg-slate-100 px-1.5 py-0.5 rounded uppercase font-bold">{p.category}</span>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteProduct(p.id)}
+                    className="p-2 hover:bg-red-50 text-red-600 rounded-lg border border-gray-100"
+                    title="Delete"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
-                <div>
-                  <span className="text-gray-400"># Public Anon Key:</span>
-                  <p className="text-slate-800 break-all font-bold">VITE_SUPABASE_ANON_KEY</p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="text-gray-400 block">Prices</span>
+                    <span className="font-mono">${p.price_usd} / €{p.price_eur} / A${p.price_aud}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400 block">MOQ / Lead</span>
+                    <span className="font-mono">{p.min_order_qty} pcs / {p.lead_time_days}d</span>
+                  </div>
                 </div>
               </div>
-
-              <div className="flex items-start gap-2 bg-amber-50 rounded p-2.5 text-[10px] text-amber-805 border border-amber-100">
-                <BadgeInfo className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                <span>If keys are missing, the applet bypasses the server and writes directly to local browser session logs to simplify client evaluation tests!</span>
-              </div>
-            </div>
+            ))}
           </div>
-
-          <div className="md:col-span-8 space-y-3">
-            <div className="bg-slate-950 text-white rounded-xl p-5 space-y-4 shadow-lg flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Database className="h-5 w-5 text-amber-500 animate-pulse" />
-                  <h4 className="font-sans text-xs font-bold uppercase tracking-wider text-slate-100">Recommended PostgreSQL SQL Schema (Run in Supabase Editor)</h4>
-                </div>
-                
-                <button
-                  id="copy-sql-btn"
-                  onClick={handleCopySql}
-                  className="text-xs bg-slate-900 hover:bg-slate-800 text-amber-400 py-1.5 px-3 rounded-lg flex items-center gap-1.5 transition-colors font-sans border border-slate-800 cursor-pointer font-bold uppercase tracking-wider text-[10px]"
-                >
-                  {copiedSql ? (
-                    <>
-                      <Check className="h-3.5 w-3.5 text-green-500" />
-                      <span>Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <ClipboardCopy className="h-3.5 w-3.5 text-amber-500 hover:scale-103" />
-                      <span>Copy SQL Schema</span>
-                    </>
-                  )}
-                </button>
-              </div>
-
-              {/* Schema text */}
-              <div className="overflow-x-auto max-h-[300px] border border-slate-800 rounded bg-slate-900 p-3 font-mono text-[10px] text-slate-400 leading-normal select-all">
-                <pre>{SUPABASE_SQL_SCHEMA}</pre>
-              </div>
-            </div>
-          </div>
-
         </div>
       )}
 
